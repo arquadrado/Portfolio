@@ -24,6 +24,7 @@ public class Game implements KeyboardHandler {
     private int totalMoves = 0;
     private int pushes = 0;
     private int totalPushes = 0;
+    private boolean canUndo = true;
 
     // starts the game
     public void start(){
@@ -355,7 +356,8 @@ public class Game implements KeyboardHandler {
                 if(i == 2)event[i].setKey(KeyboardEvent.KEY_A);
                 if(i == 3)event[i].setKey(KeyboardEvent.KEY_D);
                 if(i == 4)event[i].setKey(KeyboardEvent.KEY_R);
-                if(i == 5)event[i].setKey(KeyboardEvent.KEY_SPACE);
+                if(i == 5)event[i].setKey(KeyboardEvent.KEY_Z);
+                if(i == 6)event[i].setKey(KeyboardEvent.KEY_SPACE);
                 event[i].setKeyboardEventType(KeyboardEventType.KEY_PRESSED);
                 keyboard.addEventListener(event[i]);
             }
@@ -387,6 +389,7 @@ public class Game implements KeyboardHandler {
            // System.out.println("I'm on top of a box.");
             return true;
         } else {
+            box.setJustMoved(false);
             return false;
         }
     }
@@ -404,31 +407,39 @@ public class Game implements KeyboardHandler {
 
                     if(collisionDetector.hasBox(boxes[i].getCol(), boxes[i].getRow() + 1) || overWall(window.getGrid(), boxes[i].getRow() + 1, boxes[i].getCol())){
                         moveBox(boxes[i], 0, 0);
+                        boxes[i].setJustMoved(false);
                     }else{
                         moveBox(boxes[i], 0, 1);
+                        boxes[i].setJustMoved(true);
                     }
 
                 }
                 else if(player.getLastRow() == boxes[i].getRow() + 1 && player.getLastCol() == boxes[i].getCol()){
                     if(collisionDetector.hasBox(boxes[i].getCol(), boxes[i].getRow() - 1) || overWall(window.getGrid(), boxes[i].getRow() - 1, boxes[i].getCol())){
                         moveBox(boxes[i], 0, 0);
+                        boxes[i].setJustMoved(false);
                     }else{
                         moveBox(boxes[i], 0, -1);
+                        boxes[i].setJustMoved(true);
                     }
                 }
                 else if(player.getLastCol() == boxes[i].getCol() - 1 && player.getLastRow() == boxes[i].getRow()){
                     if(collisionDetector.hasBox(boxes[i].getCol() + 1, boxes[i].getRow()) || overWall(window.getGrid(), boxes[i].getRow(), boxes[i].getCol() + 1)){
                         moveBox(boxes[i], 0, 0);
+                        boxes[i].setJustMoved(false);
                     }else{
                         moveBox(boxes[i], 1, 0);
+                        boxes[i].setJustMoved(true);
                     }
 
                 }
                 else if(player.getLastCol() == boxes[i].getCol() + 1 && player.getLastRow() == boxes[i].getRow()){
                     if(collisionDetector.hasBox(boxes[i].getCol() - 1, boxes[i].getRow()) || overWall(window.getGrid(), boxes[i].getRow(), boxes[i].getCol() - 1)){
                         moveBox(boxes[i], 0, 0);
+                        boxes[i].setJustMoved(false);
                     }else{
                         moveBox(boxes[i], -1, 0);
+                        boxes[i].setJustMoved(true);
                     }
                 }
             }
@@ -439,6 +450,8 @@ public class Game implements KeyboardHandler {
     // move box
     public void moveBox(Box box, int wayX, int wayY) {
         box.picture.translate(wayX * window.getCellSize(), wayY * window.getCellSize());
+        box.setLastRow(box.getRow());
+        box.setLastCol(box.getCol());
         box.setCol(box.getCol() + wayX);
         box.setRow(box.getRow() + wayY);
         totalPushes++;
@@ -497,6 +510,7 @@ public class Game implements KeyboardHandler {
 
     // move player
     public void movePlayer(int wayX, int wayY){
+        if(!canUndo)canUndo = true;
         player.picture.translate(window.getCellSize() * wayX, window.getCellSize() * wayY);
         player.setLastRow(player.getRow());
         player.setLastCol(player.getCol());
@@ -534,10 +548,15 @@ public class Game implements KeyboardHandler {
 
     }
 
+    public void undo(){
+        
+    }
+
     @Override
     public void keyPressed(KeyboardEvent e) {
 
         if(e.getKey() == KeyboardEvent.KEY_W){
+            player.setDirection(Direction.UP);
 
             if(overWall(window.getGrid(), player.getRow() - 1, player.getCol())){
                 player.picture.translate(0, 0);
@@ -548,6 +567,7 @@ public class Game implements KeyboardHandler {
             }
         }
         if(e.getKey() == KeyboardEvent.KEY_S){
+            player.setDirection(Direction.DOWN);
 
             if(overWall(window.getGrid(), player.getRow() + 1, player.getCol())){
                 player.picture.translate(0, 0);
@@ -558,6 +578,8 @@ public class Game implements KeyboardHandler {
 
         }
         if(e.getKey() == KeyboardEvent.KEY_A){
+            player.setDirection(Direction.LEFT);
+
             if(overWall(window.getGrid(), player.getRow(), player.getCol() - 1)){
                 player.picture.translate(0, 0);
             } else if(canMove(-1, 0)){
@@ -566,6 +588,8 @@ public class Game implements KeyboardHandler {
             }
         }
         if(e.getKey() == KeyboardEvent.KEY_D){
+            player.setDirection(Direction.RIGHT);
+
             if(overWall(window.getGrid(), player.getRow(), player.getCol() + 1)){
                 player.picture.translate(0, 0);
             } else if(canMove(1, 0)){
@@ -577,6 +601,11 @@ public class Game implements KeyboardHandler {
 
         if(e.getKey() == KeyboardEvent.KEY_R){
             resetLevel();
+        }
+
+        if(e.getKey() == KeyboardEvent.KEY_Z) {
+            System.out.println("ctrl z");
+            undo();
         }
         if(e.getKey() == KeyboardEvent.KEY_SPACE){
             if(levelComplete){
