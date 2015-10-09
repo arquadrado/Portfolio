@@ -8,8 +8,7 @@ package org.academiadecodigo.antonio.sokoban;
 public class Player extends GameObject {
 
 
-    private int lastCol;
-    private int lastRow;
+
     private Direction direction;
     boolean frame;
     String framePath;
@@ -59,6 +58,8 @@ public class Player extends GameObject {
         this.col = col;
         this.row = row;
     }
+
+
     public String changeFrame(String framePath1, String framePath2){
         if(frame){
             framePath = framePath1;

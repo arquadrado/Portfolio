@@ -1,6 +1,5 @@
 package org.academiadecodigo.antonio.sokoban;
 
-import org.academiadecodigo.simplegraphics.graphics.Color;
 
 /**
  * Created by cadet on 28/09/15.

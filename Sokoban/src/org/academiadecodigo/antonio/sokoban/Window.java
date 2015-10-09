@@ -377,7 +377,15 @@ public class Window extends Game{
         }
     }
 
-    public void deleteWall(){
+    public static int getRow() {
+        return row;
+    }
+
+    public static int getCol() {
+        return col;
+    }
+
+    public static void deleteWall(){
         for(int i = 0; i < row; i++){
             for(int j = 0; j < col; j++){
                 if(grid[i][j]){

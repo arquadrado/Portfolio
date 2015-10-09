@@ -56,7 +56,16 @@ public class GameObject {
 
         return rectangle;
     }
+    public void setPosition(int col, int row){
+        this.col = col;
+        this.row = row;
+    }
 
+
+    public void setLastPosition(int col, int row){
+        this.lastCol = col;
+        this.lastRow = row;
+    }
 
     public int getCol() {
         return this.col;

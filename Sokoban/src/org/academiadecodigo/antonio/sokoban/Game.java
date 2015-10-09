@@ -15,6 +15,7 @@ public class Game implements KeyboardHandler {
     private Text label;
     private Player player;
     private Box[] boxes;
+    private boolean[][] boxGrid = new boolean[14][20];
     private Storage[] storagePoints;
     private Keyboard keyboard;
     private CollisionDetector collisionDetector;
@@ -55,7 +56,6 @@ public class Game implements KeyboardHandler {
 
         createKeyboard();
 
-        createCollisionDetector();
 
 
 
@@ -93,17 +93,23 @@ public class Game implements KeyboardHandler {
         label.draw();
 
     }
-
+   
     public void spawnBoxes(){
         switch (level){
             case 1:
                 boxes = new Box[6];
                 boxes[0] = new Box(5, 4, window.getCellSize());
+                boxGrid[4][5] = true;
                 boxes[1] = new Box(7, 5, window.getCellSize());
+                boxGrid[5][7] = true;
                 boxes[2] = new Box(7, 6, window.getCellSize());
+                boxGrid[6][7] = true;
                 boxes[3] = new Box(5, 6, window.getCellSize());
+                boxGrid[6][5] = true;
                 boxes[4] = new Box(5, 9, window.getCellSize());
+                boxGrid[9][5] = true;
                 boxes[5] = new Box(2, 9, window.getCellSize());
+                boxGrid[9][2] = true;
                 break;
             case 2:
                 boxes = new Box[10];
@@ -210,12 +216,13 @@ public class Game implements KeyboardHandler {
         for(int i = 0; i < boxes.length; i++){
             boxes[i].picture.delete();
         }
+        for(int i = 0; i < Window.getRow(); i++){
+            for(int j = 0; j < Window.getCol(); j++){
+                boxGrid[i][j] = false;
+            }
+        }
 
-    }
 
-    public void createCollisionDetector(){
-
-        collisionDetector = new CollisionDetector(boxes);
     }
 
     public void createStorage(){
@@ -317,17 +324,17 @@ public class Game implements KeyboardHandler {
             case 7:
                 storagePoints = new Storage[11];
 
-                storagePoints[0] = new Storage(10, 6, window.getCellSize());
-                storagePoints[1] = new Storage(9, 6, window.getCellSize());
-                storagePoints[2] = new Storage(10, 7, window.getCellSize());
-                storagePoints[3] = new Storage(9, 7, window.getCellSize());
-                storagePoints[4] = new Storage(8, 7, window.getCellSize());
-                storagePoints[5] = new Storage(10, 8, window.getCellSize());
-                storagePoints[6] = new Storage(9, 8, window.getCellSize());
-                storagePoints[7] = new Storage(8, 8, window.getCellSize());
-                storagePoints[8] = new Storage(10, 9, window.getCellSize());
-                storagePoints[9] = new Storage(9, 9, window.getCellSize());
-                storagePoints[10] = new Storage(8, 9, window.getCellSize());
+                storagePoints[0] = new Storage(10, 6, Window.getCellSize());
+                storagePoints[1] = new Storage(9, 6, Window.getCellSize());
+                storagePoints[2] = new Storage(10, 7, Window.getCellSize());
+                storagePoints[3] = new Storage(9, 7, Window.getCellSize());
+                storagePoints[4] = new Storage(8, 7, Window.getCellSize());
+                storagePoints[5] = new Storage(10, 8, Window.getCellSize());
+                storagePoints[6] = new Storage(9, 8, Window.getCellSize());
+                storagePoints[7] = new Storage(8, 8, Window.getCellSize());
+                storagePoints[8] = new Storage(10, 9, Window.getCellSize());
+                storagePoints[9] = new Storage(9, 9, Window.getCellSize());
+                storagePoints[10] = new Storage(8, 9, Window.getCellSize());
                 break;
         }
 
@@ -346,7 +353,7 @@ public class Game implements KeyboardHandler {
         // define keyboard events
         keyboard = new Keyboard(this);
 
-        KeyboardEvent[] event = new KeyboardEvent[6];
+        KeyboardEvent[] event = new KeyboardEvent[7];
 
         for(int i = 0; i < event.length; i++){
 
@@ -374,206 +381,138 @@ public class Game implements KeyboardHandler {
         label.draw();
     }
 
-    public boolean checkSurroundings(){
-        return false;
-    }
-    public Box boxNext(Direction direction){
-        Box boxToReturn = null;
-        for(int i = 0; i < boxes.length; i++){
-            switch (direction){
+    /**
+     * Checks the cell next to the given object in a certain direction
+     * @param gameObject
+     * @param direction
+     * @returns 0 if empty, 1 if box or -1 if wall
+     */
+    public int checkSurroundings(GameObject gameObject, Direction direction){
+        int col = gameObject.getCol();
+        int row = gameObject.getRow();
+        switch (direction){
                 case UP:
-                    if(boxes[i].getCol() == player.getCol() && boxes[i].getRow() == player.getRow() - 1)
-                         boxToReturn = boxes[i];
+                    if(isWall(col, row - 1))return -1;
+                    if(isBox(col, row - 1)) return 1;
                     break;
                 case DOWN:
-                    if(boxes[i].getCol() == player.getCol() && boxes[i].getRow() == player.getRow() + 1)
-                        boxToReturn = boxes[i];
+                    if(isWall(col, row + 1))return -1;
+                    if(isBox(col, row + 1)) return 1;
                     break;
                 case RIGHT:
-                    if(boxes[i].getCol() == player.getCol() + 1 && boxes[i].getRow() == player.getRow())
-                        boxToReturn = boxes[i];
+                    if(isWall(col + 1, row))return -1;
+                    if(isBox(col + 1, row)) return 1;
                     break;
                 case LEFT:
-                    if(boxes[i].getCol() == player.getCol() - 1 && boxes[i].getRow() == player.getRow())
-                        boxToReturn = boxes[i];
+                    if(isWall(col - 1, row))return -1;
+                    if(isBox(col - 1, row)) return 1;
+                    break;
+        }
+       return 0;
+    }
+
+    public Box boxNext(Direction direction){
+        Box boxToReturn = null;
+        for(Box box : boxes){
+
+            int boxCol = box.getCol();
+            int boxRow = box.getRow();
+
+            switch (direction){
+                case UP:
+                    if(boxCol == player.getCol() && boxRow == player.getRow() - 1)
+                         boxToReturn = box;
+                    break;
+                case DOWN:
+                    if(boxCol == player.getCol() && boxRow == player.getRow() + 1)
+                        boxToReturn = box;
+                    break;
+                case RIGHT:
+                    if(boxCol == player.getCol() + 1 && boxRow == player.getRow())
+                        boxToReturn = box;
+                    break;
+                case LEFT:
+                    if(boxCol == player.getCol() - 1 && boxRow == player.getRow())
+                        boxToReturn = box;
                     break;
             }
         }
         return boxToReturn;
     }
-    public boolean canMove(GameObject gameObject, Direction direction){
-        if(gameObject.getId() == ID.PLAYER){
-            switch (direction){
-                case UP:
-                    if(isWall(gameObject.getCol(), gameObject.getRow() - 1)){
-                        return false;
-                    } else if(!canMove(boxNext(direction), direction)){
-                        return false;
-                    } else {
-                        return true;
-                    }
-                case DOWN:
-                    if(isWall(gameObject.getCol(), gameObject.getRow() + 1)){
-                        return false;
-                    } else if(!canMove(boxNext(direction), direction)){
-                        return false;
-                    } else {
-                        return true;
-                    }
-                case RIGHT:
-                    if(isWall(gameObject.getCol() + 1, gameObject.getRow())){
-                        return false;
-                    } else if(!canMove(boxNext(direction), direction)){
-                        return false;
-                    } else {
-                        return true;
-                    }
-                case LEFT:
-                    if(isWall(gameObject.getCol() - 1, gameObject.getRow())){
-                        return false;
-                    } else if(!canMove(boxNext(direction), direction)){
-                        return false;
-                    } else {
-                        return true;
-                    }
-            }
-        }
-        else if(gameObject.getId() != null){
-            switch (direction){
-                case UP:
-                    if(isWall(gameObject.getCol(), gameObject.getRow() - 1)){
-                        return false;
-                    } else if(!canMove(boxNext(direction), direction)){ //check if there's another box, replace
-                        return false;
-                    } else {
-                        return true;
-                    }
-                case DOWN:
-                    if(isWall(gameObject.getCol(), gameObject.getRow() + 1)){
-                        return false;
-                    } else if(!canMove(boxNext(direction), direction)){
-                        return false;
-                    } else {
-                        return true;
-                    }
-                case RIGHT:
-                    if(isWall(gameObject.getCol() + 1, gameObject.getRow())){
-                        return false;
-                    } else if(!canMove(boxNext(direction), direction)){
-                        return false;
-                    } else {
-                        return true;
-                    }
-                case LEFT:
-                    if(isWall(gameObject.getCol() - 1, gameObject.getRow())){
-                        return false;
-                    } else if(!canMove(boxNext(direction), direction)){
-                        return false;
-                    } else {
-                        return true;
-                    }
-            }
 
+    public boolean canMove(GameObject gameObject, Direction direction){
+
+        switch(gameObject.getId()){
+            case PLAYER:
+                if(checkSurroundings(gameObject, direction) < 0 ){
+                    return false;
+                }else if(checkSurroundings(gameObject, direction) == 0){
+                    return true;
+                } else {
+                    return canMove(boxNext(direction), direction);
+                }
+            case BOX:
+                return checkSurroundings(gameObject, direction) == 0;
         }
-        return false;
+        return true;
     }
 
     public boolean isWall(int col, int row){
-        if(window.getGrid()[row][col]){
-            return  true;
-        } else {
-            return false;
-        }
+        return window.getGrid()[row][col];
     }
 
-    //  checks if object is over a wall
-    public boolean overWall(boolean[][] grid, int row, int col){
-        if(grid[row][col]){
-            //System.out.println("I'm on top of the wall");
-            return true;
-        } else{
-            return false;
-        }
+    public boolean isBox(int col, int row){
+        return boxGrid[row][col];
     }
 
-    // checks if player is colliding with a box
-    public boolean checkCollision(Box box) {
-        if (box.getCol() == player.getCol() && box.getRow() == player.getRow()) {
-           // System.out.println("I'm on top of a box.");
-            return true;
-        } else {
-            box.setJustMoved(false);
-            return false;
+    public void move(GameObject gameObject, Direction direction){
+        int col = gameObject.getCol();
+        int row = gameObject.getRow();
+        gameObject.setLastPosition(col, row);
+        switch (direction){
+            case UP:
+                updatePosition(gameObject, 0, -1);
+                if(gameObject.getId() == ID.BOX){
+                    updateBox(gameObject);
+                }
+                break;
+            case DOWN:
+                updatePosition(gameObject, 0, 1);
+                if(gameObject.getId() == ID.BOX){
+                    updateBox(gameObject);
+                }
+                break;
+            case LEFT:
+                updatePosition(gameObject, -1, 0);
+                if(gameObject.getId() == ID.BOX){
+                    updateBox(gameObject);
+                }
+                break;
+            case RIGHT:
+                updatePosition(gameObject, 1, 0);
+                if(gameObject.getId() == ID.BOX){
+                    updateBox(gameObject);
+                }
+                break;
         }
+
+
     }
 
-    // checks the direction of the collision
-    public void checkCollisionDirection() {
+    public  void updatePosition(GameObject gameObject, int wayX, int wayY){
+        gameObject.picture.translate(Window.getCellSize() * wayX, Window.getCellSize() * wayY);
+        gameObject.setPosition(gameObject.getCol() + wayX, gameObject.getRow() + wayY);
 
-        for(int i = 0; i < boxes.length; i++){
 
-            if(checkCollision(boxes[i])){
-                //System.out.println("We are in the same position");
-                //System.out.println("==========================================");
-
-                if(player.getLastRow() == boxes[i].getRow() - 1 && player.getLastCol() == boxes[i].getCol()){
-
-                    if(collisionDetector.hasBox(boxes[i].getCol(), boxes[i].getRow() + 1) || overWall(window.getGrid(), boxes[i].getRow() + 1, boxes[i].getCol())){
-                        moveBox(boxes[i], 0, 0);
-                        boxes[i].setJustMoved(false);
-                    }else{
-                        moveBox(boxes[i], 0, 1);
-                        boxes[i].setJustMoved(true);
-                    }
-
-                }
-                else if(player.getLastRow() == boxes[i].getRow() + 1 && player.getLastCol() == boxes[i].getCol()){
-                    if(collisionDetector.hasBox(boxes[i].getCol(), boxes[i].getRow() - 1) || overWall(window.getGrid(), boxes[i].getRow() - 1, boxes[i].getCol())){
-                        moveBox(boxes[i], 0, 0);
-                        boxes[i].setJustMoved(false);
-                    }else{
-                        moveBox(boxes[i], 0, -1);
-                        boxes[i].setJustMoved(true);
-                    }
-                }
-                else if(player.getLastCol() == boxes[i].getCol() - 1 && player.getLastRow() == boxes[i].getRow()){
-                    if(collisionDetector.hasBox(boxes[i].getCol() + 1, boxes[i].getRow()) || overWall(window.getGrid(), boxes[i].getRow(), boxes[i].getCol() + 1)){
-                        moveBox(boxes[i], 0, 0);
-                        boxes[i].setJustMoved(false);
-                    }else{
-                        moveBox(boxes[i], 1, 0);
-                        boxes[i].setJustMoved(true);
-                    }
-
-                }
-                else if(player.getLastCol() == boxes[i].getCol() + 1 && player.getLastRow() == boxes[i].getRow()){
-                    if(collisionDetector.hasBox(boxes[i].getCol() - 1, boxes[i].getRow()) || overWall(window.getGrid(), boxes[i].getRow(), boxes[i].getCol() - 1)){
-                        moveBox(boxes[i], 0, 0);
-                        boxes[i].setJustMoved(false);
-                    }else{
-                        moveBox(boxes[i], -1, 0);
-                        boxes[i].setJustMoved(true);
-                    }
-                }
-            }
-
-        }
     }
 
-    // move box
-    public void moveBox(Box box, int wayX, int wayY) {
-        box.picture.translate(wayX * window.getCellSize(), wayY * window.getCellSize());
-        box.setLastRow(box.getRow());
-        box.setLastCol(box.getCol());
-        box.setCol(box.getCol() + wayX);
-        box.setRow(box.getRow() + wayY);
-        totalPushes++;
-        pushes++;
-        updateLabel();
+    public void updateBox(GameObject gameObject){
+        boxGrid[gameObject.lastRow][gameObject.lastCol] = false;
+        boxGrid[gameObject.row][gameObject.col] = true;
         onPlace();
         levelStatus();
-        // System.out.println("Box Current col: " + box.getCol() + " Current Box row: " + box.getRow());
     }
+
     // checks if boxes are stored
     public void onPlace(){
         for(int i = 0; i < boxes.length; i++){
@@ -604,39 +543,10 @@ public class Game implements KeyboardHandler {
         picture.draw();
         return true;
     }
-    // checks if player can move
-    public boolean canMove(int wayX, int wayY){
 
-        if( collisionDetector.hasBox(player.getCol() + 1 * wayX, player.getRow() + 1 * wayY) &&
-            collisionDetector.hasBox(player.getCol() + 2 * wayX, player.getRow() + 2 * wayY)) {
-
-            return false;
-        } else if(collisionDetector.hasBox(player.getCol() + 1 * wayX, player.getRow() + 1 * wayY) &&
-                overWall(window.getGrid(), player.getRow() + 2 * wayY, player.getCol() + 2 * wayX )){
-            return false;
-        } else {
-            return true;
-        }
-
-
-    }
-
-    // move player
-    public void movePlayer(int wayX, int wayY){
-        if(!canUndo)canUndo = true;
-        player.picture.translate(window.getCellSize() * wayX, window.getCellSize() * wayY);
-        player.setLastRow(player.getRow());
-        player.setLastCol(player.getCol());
-        player.setCol(player.getCol() + 1 * wayX);
-        player.setRow(player.getRow() + 1 * wayY);
-        moves++;
-        totalMoves++;
-        updateLabel();
-        printPositions();
-    }
 
     // print player's current position and last position
-    public void printPositions(){
+    public void printPositions() {
         System.out.println("Current col: " + player.getCol() + " Current row: " + player.getRow());
         System.out.println("Last col: " + player.getLastCol() + " Last row: " + player.getLastRow());
         System.out.println("==========================================");
@@ -646,7 +556,7 @@ public class Game implements KeyboardHandler {
     public void resetLevel(){
         pushes = 0;
         moves = 0;
-        if(levelComplete){
+        if(levelComplete) {
             picture.delete();
         }
         label.delete();
@@ -656,7 +566,6 @@ public class Game implements KeyboardHandler {
         createLabel();
         createStorage();
         spawnBoxes();
-        createCollisionDetector();
         createPlayer();
 
     }
@@ -665,53 +574,78 @@ public class Game implements KeyboardHandler {
         
     }
 
+    public Box getBox(){
+
+        for(Box box : boxes){
+
+            if(player.getCol() == box.getCol() && player.getRow() == box.getRow()){
+                return box;
+            }
+
+
+        }
+        return null;
+    }
+
+    public void updateMoves(Direction direction){
+        switch (direction){
+            case UP:
+                player.picture.load(player.changeFrame("resources/" + player.chooseChar() + "top1.png", "resources/" + player.chooseChar() +"top2.png"));
+                break;
+            case DOWN:
+                player.picture.load(player.changeFrame("resources/" + player.chooseChar() + "bot1.png", "resources/" + player.chooseChar() +"bot2.png"));
+                break;
+            case LEFT:
+                player.picture.load(player.changeFrame("resources/" + player.chooseChar() + "left1.png", "resources/" + player.chooseChar() +"left2.png"));
+                break;
+            case RIGHT:
+                player.picture.load(player.changeFrame("resources/" + player.chooseChar() + "right1.png", "resources/" + player.chooseChar() +"right2.png"));
+        }
+        moves++;
+        totalMoves++;
+        updateLabel();
+    }
+    public void updatePushes(){
+        pushes++;
+        totalPushes++;
+        updateLabel();
+    }
     @Override
     public void keyPressed(KeyboardEvent e) {
 
-        if(e.getKey() == KeyboardEvent.KEY_W){
-
-
-            if(overWall(window.getGrid(), player.getRow() - 1, player.getCol())){
-                player.picture.translate(0, 0);
-
-            } else if(canMove(0, -1)){
-                player.picture.load(player.changeFrame("resources/" + player.chooseChar() + "top1.png", "resources/" + player.chooseChar() +"top2.png"));
-                movePlayer(0, -1);
+        if(e.getKey() == KeyboardEvent.KEY_W && canMove(player, Direction.UP)){
+            move(player, Direction.UP);
+            updateMoves(Direction.UP);
+            if(getBox() != null){
+                move(getBox(), Direction.UP);
+                updatePushes();
             }
         }
-        if(e.getKey() == KeyboardEvent.KEY_S){
-
-
-            if(overWall(window.getGrid(), player.getRow() + 1, player.getCol())){
-                player.picture.translate(0, 0);
-            } else if(canMove(0, 1)){
-                player.picture.load(player.changeFrame("resources/" + player.chooseChar() + "bot1.png", "resources/" + player.chooseChar() + "bot2.png"));
-                movePlayer(0, 1);
-            }
-
-        }
-        if(e.getKey() == KeyboardEvent.KEY_A){
-
-
-            if(overWall(window.getGrid(), player.getRow(), player.getCol() - 1)){
-                player.picture.translate(0, 0);
-            } else if(canMove(-1, 0)){
-                player.picture.load(player.changeFrame("resources/" + player.chooseChar() + "left1.png", "resources/" + player.chooseChar() + "left2.png"));
-                movePlayer(-1, 0);
+        if(e.getKey() == KeyboardEvent.KEY_S && canMove(player, Direction.DOWN)){
+            move(player, Direction.DOWN);
+            updateMoves(Direction.DOWN);
+            if(getBox() != null){
+                move(getBox(), Direction.DOWN);
+                updatePushes();
             }
         }
-        if(e.getKey() == KeyboardEvent.KEY_D){
-
-
-            if(overWall(window.getGrid(), player.getRow(), player.getCol() + 1)){
-                player.picture.translate(0, 0);
-            } else if(canMove(1, 0)){
-                player.picture.load(player.changeFrame("resources/" + player.chooseChar() + "right1.png", "resources/" + player.chooseChar() + "right2.png"));
-                movePlayer(1, 0);
+        if(e.getKey() == KeyboardEvent.KEY_A && canMove(player, Direction.LEFT)){
+            move(player, Direction.LEFT);
+            updateMoves(Direction.LEFT);
+            if(getBox() != null){
+                move(getBox(), Direction.LEFT);
+                updatePushes();
             }
         }
-        checkCollisionDirection();
+        if(e.getKey() == KeyboardEvent.KEY_D && canMove(player, Direction.RIGHT)) {
 
+            move(player, Direction.RIGHT);
+            updateMoves(Direction.RIGHT);
+            if(getBox() != null){
+                move(getBox(), Direction.RIGHT);
+                updatePushes();
+            }
+        }
         if(e.getKey() == KeyboardEvent.KEY_R){
             resetLevel();
         }
@@ -723,11 +657,14 @@ public class Game implements KeyboardHandler {
         if(e.getKey() == KeyboardEvent.KEY_SPACE){
             if(levelComplete){
                 level++;
-                window.deleteWall();
-                window.createWalls(level);
+                Window.deleteWall();
+                Window.createWalls(level);
                 resetLevel();
                 levelComplete = false;
+                picture.delete();
+                System.out.println("Space pressed");
             }
+            System.out.println("Space pressed");
         }
     }
 
