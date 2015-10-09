@@ -18,7 +18,6 @@ public class Game implements KeyboardHandler {
     private boolean[][] boxGrid = new boolean[14][20];
     private Storage[] storagePoints;
     private Keyboard keyboard;
-    private CollisionDetector collisionDetector;
     private Picture picture;
     private boolean levelComplete = false;
     private int level = 1;
@@ -93,7 +92,7 @@ public class Game implements KeyboardHandler {
         label.draw();
 
     }
-   
+
     public void spawnBoxes(){
         switch (level){
             case 1:
