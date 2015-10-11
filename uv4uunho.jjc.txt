@@ -1,0 +1,53 @@
+﻿
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+# On branch master
+# Your branch is up-to-date with 'origin/master'.
+#
+# Changes to be committed:
+#	deleted:    Sokoban/.gitignore
+#	deleted:    Sokoban/build.xml
+#	deleted:    Sokoban/lib/simplegraphics.jar
+#	deleted:    Sokoban/resources/Level.png
+#	deleted:    Sokoban/resources/box1-ina.png
+#	deleted:    Sokoban/resources/box1.png
+#	deleted:    Sokoban/resources/box2 - ina.png
+#	deleted:    Sokoban/resources/box2.png
+#	deleted:    Sokoban/resources/brick.png
+#	deleted:    Sokoban/resources/brickgrey.png
+#	deleted:    Sokoban/resources/facingbot1.png
+#	deleted:    Sokoban/resources/facingbot2.png
+#	deleted:    Sokoban/resources/facingleft1.png
+#	deleted:    Sokoban/resources/facingleft2.png
+#	deleted:    Sokoban/resources/facingright1.png
+#	deleted:    Sokoban/resources/facingright2.png
+#	deleted:    Sokoban/resources/facingtop1.png
+#	deleted:    Sokoban/resources/facingtop2.png
+#	deleted:    Sokoban/resources/levelac.png
+#	deleted:    Sokoban/resources/levelac2.png
+#	deleted:    Sokoban/resources/nextlevel.png
+#	deleted:    Sokoban/resources/storage.png
+#	deleted:    Sokoban/resources/unicornbot1.png
+#	deleted:    Sokoban/resources/unicornbot2.png
+#	deleted:    Sokoban/resources/unicornleft1.png
+#	deleted:    Sokoban/resources/unicornleft2.png
+#	deleted:    Sokoban/resources/unicornright1.png
+#	deleted:    Sokoban/resources/unicornright2.png
+#	deleted:    Sokoban/resources/unicorntop1.png
+#	deleted:    Sokoban/resources/unicorntop2.png
+#	deleted:    Sokoban/resources/wall.jpg
+#	deleted:    Sokoban/src/META-INF/MANIFEST.MF
+#	deleted:    Sokoban/src/org/academiadecodigo/antonio/sokoban/Box.java
+#	deleted:    Sokoban/src/org/academiadecodigo/antonio/sokoban/CollisionDetector.java
+#	deleted:    Sokoban/src/org/academiadecodigo/antonio/sokoban/Game.java
+#	deleted:    Sokoban/src/org/academiadecodigo/antonio/sokoban/GameObject.java
+#	deleted:    Sokoban/src/org/academiadecodigo/antonio/sokoban/ID.java
+#	deleted:    Sokoban/src/org/academiadecodigo/antonio/sokoban/Player.java
+#	deleted:    Sokoban/src/org/academiadecodigo/antonio/sokoban/Storage.java
+#	deleted:    Sokoban/src/org/academiadecodigo/antonio/sokoban/Wall.java
+#	deleted:    Sokoban/src/org/academiadecodigo/antonio/sokoban/Window.java
+#
+# Untracked files:
+#	concept ideas.txt
+#
+

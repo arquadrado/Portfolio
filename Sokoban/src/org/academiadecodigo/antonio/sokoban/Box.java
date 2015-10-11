@@ -7,8 +7,7 @@ package org.academiadecodigo.antonio.sokoban;
 public class Box extends GameObject {
     private boolean stored;
     private boolean justMoved;
-    private int lastCol;
-    private int lastRow;
+
 
     public Box(int col, int row, int cell) {
         this.stored = false;

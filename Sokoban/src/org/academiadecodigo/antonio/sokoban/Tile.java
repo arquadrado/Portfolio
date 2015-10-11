@@ -1,53 +1,65 @@
-package org.academiadecodigo.antonio.MapCreator;
+package org.academiadecodigo.antonio.sokoban;
 
 import org.academiadecodigo.simplegraphics.graphics.Color;
 import org.academiadecodigo.simplegraphics.graphics.Rectangle;
 
 /**
- * Created by cadet on 09/10/15.
+ * Created by António on 10-10-2015.
  */
 public class Tile {
     private boolean wall = false;
     private boolean box = false;
     private boolean storagePoint = false;
     private Rectangle rectangle;
+    private int col;
+    private int row;
 
     public Tile(int originX, int originY, int col, int row){
+        this.col = col;
+        this.row = row;
         this.rectangle = new Rectangle(originX, originY, col, row);
-        rectangle.setColor(Color.BLACK);
+        rectangle.setColor(Color.WHITE);
         rectangle.draw();
     }
 
     public void createWall(){
-        rectangle.setColor(Color.BLACK);
-        rectangle.fill();
         this.wall = true;
     }
 
     public void createBox(){
-        rectangle.setColor(Color.GRAY);
-        rectangle.fill();
         this.box = true;
 
     }
 
     public void createStoragePoint(){
-        rectangle.setColor(Color.LIGHT_GRAY);
+        this.storagePoint = true;
+
+    }
+
+    public void createEmptySpace(){
+        rectangle.setColor(Color.WHITE);
         rectangle.fill();
         this.storagePoint = true;
 
     }
 
     public void removeObject(){
+        rectangle.delete();
         this.wall = false;
         this.box = false;
         this.storagePoint = false;
-        rectangle.setColor(Color.BLACK);
-        rectangle.draw();
     }
 
     public boolean isWall() {
         return wall;
+    }
+
+    public int getCol() {
+        return col;
+    }
+
+    public int getRow() {
+        return row;
     }
 
     public boolean isBox() {
