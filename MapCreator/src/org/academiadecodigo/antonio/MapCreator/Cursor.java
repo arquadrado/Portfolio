@@ -6,15 +6,21 @@ import org.academiadecodigo.simplegraphics.graphics.Rectangle;
 /**
  * Created by cadet on 09/10/15.
  */
-public class Cursor extends MapCreator{
+public class Cursor {
 
     public Rectangle body;
     private int col = 0;
     private int row = 0;
+    private int rangeX;
+    private int rangeY;
+    private int size;
 
 
-    public Cursor() {
-        this.body = new Rectangle(0, 0, 50, 50);
+    public Cursor(int cols, int rows, int size) {
+        this.rangeX = cols;
+        this.rangeY = rows;
+        this.size = size;
+        this.body = new Rectangle(col, row, size, size);
         body.setColor(Color.RED);
         body.fill();
     }
@@ -35,12 +41,12 @@ public class Cursor extends MapCreator{
 
     public void move(int wayX, int wayY){
         this.body.delete();
-        col = (col + wayX) % (cols);
-        row = (row + wayY) % (rows);
-        if(col < 0)col += cols;
-        if(row < 0)row += rows;
+        col = (col + wayX) % (rangeX);
+        row = (row + wayY) % (rangeY);
+        if(col < 0)col += rangeX;
+        if(row < 0)row += rangeY;
         System.out.println("Col: " + col + " Row: " + row );
-        this.body = new Rectangle(col * cellSize, row * cellSize, cellSize, cellSize);
+        this.body = new Rectangle(col * size, row * size, size, size);
         body.setColor(Color.GREEN);
         body.fill();
 

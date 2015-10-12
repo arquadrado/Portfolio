@@ -18,9 +18,8 @@ public class MapCreator implements KeyboardHandler {
     private Cursor cursor;
     private Tile[][] grid;
     private PrintWriter fileWriter;
-    protected int cellSize = 50;
-    protected int cols = 20;
-    protected int rows = 14;
+    protected int cols = 19;
+    protected int rows = 17;
 
 
     public void start(){
@@ -29,7 +28,7 @@ public class MapCreator implements KeyboardHandler {
 
     public void run(){
 
-        createGrid(20, 14);
+        createGrid(cols, rows);
         createKeyboard();
         createCursor();
 
@@ -37,7 +36,7 @@ public class MapCreator implements KeyboardHandler {
 
     public void creatorFileWriter(){
         try {
-            fileWriter = new PrintWriter("map-level-2.txt", "UTF-8");
+            fileWriter = new PrintWriter("map-level-5.txt", "UTF-8");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (UnsupportedEncodingException e) {
@@ -56,11 +55,15 @@ public class MapCreator implements KeyboardHandler {
 
                 if(grid[i][j].isWall()){
                     string += '#';
-                } else if(grid[i][j].isBox()){
+                }else if(grid[i][j].isBox()){
                     string += 'x';
                 }else if(grid[i][j].isStoragePoint()){
                     string += 'p';
-                }else {
+                }else if(grid[i][j].isBox() && grid[i][j].isStoragePoint()){
+                    string += '$';
+                }else  if(grid[i][j].isPlayer()){
+                    string += 'j';
+                }else  {
                     string += '0';
                 }
             }
@@ -70,7 +73,7 @@ public class MapCreator implements KeyboardHandler {
     }
     public void createCursor(){
 
-        cursor = new Cursor();
+        cursor = new Cursor(cols, rows, Tile.getSize());
     }
 
     public void createGrid(int col, int row){
@@ -79,7 +82,7 @@ public class MapCreator implements KeyboardHandler {
         for(int i = 0; i < row; i++){
             grid[i] = new Tile[col];
             for(int j = 0; j < col; j++){
-                grid[i][j] = new Tile(j * cellSize, i * cellSize, cellSize, cellSize);
+                grid[i][j] = new Tile(j, i);
             }
         }
 
@@ -88,7 +91,7 @@ public class MapCreator implements KeyboardHandler {
     public void createKeyboard(){
         keyboard = new Keyboard(this);
 
-        KeyboardEvent[] event = new KeyboardEvent[9];
+        KeyboardEvent[] event = new KeyboardEvent[10];
 
         for(int i = 0; i < event.length; i++){
 
@@ -102,6 +105,7 @@ public class MapCreator implements KeyboardHandler {
                 if(i == 6)event[i].setKey(KeyboardEvent.KEY_M);
                 if(i == 7)event[i].setKey(KeyboardEvent.KEY_SPACE);
                 if(i == 8)event[i].setKey(KeyboardEvent.KEY_P);
+                if(i == 9)event[i].setKey(KeyboardEvent.KEY_V);
                 event[i].setKeyboardEventType(KeyboardEventType.KEY_PRESSED);
                 keyboard.addEventListener(event[i]);
 
@@ -121,6 +125,9 @@ public class MapCreator implements KeyboardHandler {
         }
         if(e.getKey() == KeyboardEvent.KEY_D) {
             cursor.move(1, 0);
+        }
+        if(e.getKey() == KeyboardEvent.KEY_V) {
+            grid[cursor.getRow()][cursor.getCol()].createPlayer();
         }
         if(e.getKey() == KeyboardEvent.KEY_B) {
             grid[cursor.getRow()][cursor.getCol()].createBox();

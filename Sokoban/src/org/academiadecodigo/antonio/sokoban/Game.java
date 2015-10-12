@@ -8,17 +8,16 @@ import org.academiadecodigo.simplegraphics.keyboard.KeyboardEventType;
 import org.academiadecodigo.simplegraphics.keyboard.KeyboardHandler;
 import org.academiadecodigo.simplegraphics.pictures.Picture;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 
 
 public class Game implements KeyboardHandler {
 
+    private boolean running = false;
     private int cellSize = 50;
     private int col = 20;
-    private int row = 14;
+    private int row = 17;
     private Text label;
     private Player player;
     private Tile[][] grid;
@@ -34,36 +33,36 @@ public class Game implements KeyboardHandler {
     private int pushes = 0;
     private int totalPushes = 0;
     private FileReader fileReader;
+    boolean frame = true;
+    boolean newGame;
     private boolean canUndo = true;
 
     // starts the game
     public void start(){
 
         createGrid(col, row);
-        run();
+
+        createKeyboard();
+        picture = new Picture(0, 0, "resources/startgame.png");
+        picture.draw();
     }
 
 
 
     public void run() {
-
+        running = true;
+        picture.delete();
         //create map
         try {
             createLevel();
             spawnBoxes();
+            createPlayer();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        // creates a new player
-        createPlayer();
 
         // create a new label to keep stats
         createLabel();
-
-        createKeyboard();
-
-
-
 
     }
 
@@ -79,11 +78,11 @@ public class Game implements KeyboardHandler {
 
     }
     public void createLevel() throws IOException {
-        boxes = new ArrayList<Box>();
-        storagePoints = new ArrayList<Storage>();
-        walls = new ArrayList<Wall>();
+        boxes = new ArrayList<>();
+        storagePoints = new ArrayList<>();
+        walls = new ArrayList<>();
         try {
-            fileReader = new FileReader("resources/map-level-" + level + ".txt");
+            fileReader = new FileReader("maps/map-level-" + level + ".txt");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -94,10 +93,10 @@ public class Game implements KeyboardHandler {
                 if(character == '#'){
                     grid[i][j].createWall();
                     walls.add(new Wall(j, i, cellSize));
-                } else if(character == 'p'){
+                } else if(character == 'p' || character == '$'){
                     grid[i][j].createStoragePoint();
                     storagePoints.add(new Storage(j, i, cellSize));
-                } else {
+                } else  {
                     grid[i][j].createEmptySpace();
                 }
             }
@@ -106,10 +105,10 @@ public class Game implements KeyboardHandler {
     }
 
     public void spawnBoxes() throws IOException {
-        boxes = new ArrayList<Box>();
+        boxes = new ArrayList<>();
 
         try {
-            fileReader = new FileReader("resources/map-level-" + level + ".txt");
+            fileReader = new FileReader("maps/map-level-" + level + ".txt");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
@@ -117,7 +116,7 @@ public class Game implements KeyboardHandler {
 
             for(int j = 0; j < col; j++){
                 int character = fileReader.read();
-                 if(character == 'x'){
+                 if(character == 'x' || character == '$'){
                     grid[i][j].createBox();
                     boxes.add(new Box(j, i, cellSize));
                 }
@@ -126,49 +125,43 @@ public class Game implements KeyboardHandler {
 
     }
 
-    //TO SOLVE!!!!!!
+
     public void deleteLevel() throws IOException {
-        int index = 0;
-        while(index < boxes.size()){
-            boxes.get(index++).picture.delete();
-            storagePoints.get(index++).picture.delete();
+        int boxIndex = 0;
+        int storageIndex = 0;
+        int wallIndex = 0;
+
+        while(boxIndex < boxes.size()){
+            boxes.get(boxIndex++).picture.delete();
+            storagePoints.get(storageIndex++).picture.delete();
         }
-        while(index < walls.size()){
-            walls.get(index++).picture.delete();
+        while(wallIndex < walls.size()){
+            walls.get(wallIndex++).picture.delete();
         }
         for(int i = 0; i < row; i++){
 
             for(int j = 0; j < col; j++){
-                if( grid[i][j].isBox() || grid[i][j].isWall()){
+                if(grid[i][j].isBox() || grid[i][j].isWall() || grid[i][j].isStoragePoint()){
                     grid[i][j].removeObject();
                 }
             }
         }
 
     }
-    public void createPlayer(){
-        switch (level){
-            case 1:
-                player = new Player(11, 10, cellSize);
-                break;
-            case 2:
-                player = new Player(11, 6, cellSize);
-                break;
-            case 3:
-                player = new Player(15, 3, cellSize);
-                break;
-            case 4:
-                player = new Player(10, 11, cellSize);
-                break;
-            case 5:
-                player = new Player(15, 8, cellSize);
-                break;
-            case 6:
-                player = new Player(13, 3, cellSize);
-                break;
-            case 7:
-                player = new Player(5, 2, cellSize);
-                break;
+    public void createPlayer() throws IOException {
+        try {
+            fileReader = new FileReader("maps/map-level-" + level + ".txt");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        for(int i = 0; i < row; i++){
+
+            for(int j = 0; j < col; j++){
+                int character = fileReader.read();
+                if(character == 'j'){
+                   player = new Player(j, i, cellSize);
+                }
+            }
         }
     }
 
@@ -179,27 +172,71 @@ public class Game implements KeyboardHandler {
 
     }
 
+    public void loadGame(){
+        try {
+            fileReader = new FileReader("saves/savegame.txt");
+            BufferedReader buffer = new BufferedReader(fileReader);
+            String line = buffer.readLine();
+
+            System.out.println(line);
+
+            this.level = Integer.parseInt(line);
+
+            System.out.println("load" + level);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void saveGame(){
+
+            try {
+                //fileWriter = new PrintWriter("saves/savegame.txt", "UTF-8");
+                FileWriter fileWriter = new FileWriter("saves/savegame.txt");
+                fileWriter.write(new Integer(level).toString());
+                fileWriter.close();
+                System.out.println("Saving...");
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+
+
+    }
 
     public void createKeyboard(){
         // define keyboard events
         keyboard = new Keyboard(this);
 
-        KeyboardEvent[] event = new KeyboardEvent[7];
+        KeyboardEvent[] event = new KeyboardEvent[12];
 
         for(int i = 0; i < event.length; i++){
 
-            if(player.getId() == ID.PLAYER){
-                event[i] = new KeyboardEvent();
-                if(i == 0)event[i].setKey(KeyboardEvent.KEY_W);
-                if(i == 1)event[i].setKey(KeyboardEvent.KEY_S);
-                if(i == 2)event[i].setKey(KeyboardEvent.KEY_A);
-                if(i == 3)event[i].setKey(KeyboardEvent.KEY_D);
-                if(i == 4)event[i].setKey(KeyboardEvent.KEY_R);
-                if(i == 5)event[i].setKey(KeyboardEvent.KEY_Z);
-                if(i == 6)event[i].setKey(KeyboardEvent.KEY_SPACE);
-                event[i].setKeyboardEventType(KeyboardEventType.KEY_PRESSED);
-                keyboard.addEventListener(event[i]);
-            }
+            event[i] = new KeyboardEvent();
+            if(i == 0)event[i].setKey(KeyboardEvent.KEY_W);
+            if(i == 1)event[i].setKey(KeyboardEvent.KEY_S);
+            if(i == 2)event[i].setKey(KeyboardEvent.KEY_A);
+            if(i == 3)event[i].setKey(KeyboardEvent.KEY_D);
+            if(i == 4)event[i].setKey(KeyboardEvent.KEY_R);
+            if(i == 5)event[i].setKey(KeyboardEvent.KEY_Z);
+            if(i == 6)event[i].setKey(KeyboardEvent.KEY_SPACE);
+            if(i == 7)event[i].setKey(KeyboardEvent.KEY_L);
+            if(i == 8)event[i].setKey(KeyboardEvent.KEY_K);
+            if(i == 9)event[i].setKey(KeyboardEvent.KEY_H);
+            if(i == 10)event[i].setKey(KeyboardEvent.KEY_UP);
+            if(i == 11)event[i].setKey(KeyboardEvent.KEY_DOWN);
+            event[i].setKeyboardEventType(KeyboardEventType.KEY_PRESSED);
+            keyboard.addEventListener(event[i]);
+
 
         }
     }
@@ -358,7 +395,6 @@ public class Game implements KeyboardHandler {
                 }
             }
         }
-
     }
 
     public boolean levelStatus(){
@@ -370,6 +406,7 @@ public class Game implements KeyboardHandler {
             }
         }
         levelComplete = true;
+        level++;
         picture = new Picture(0, 0, "resources/levelac2.png");
         picture.draw();
         return true;
@@ -391,15 +428,18 @@ public class Game implements KeyboardHandler {
             picture.delete();
         }
         label.delete();
+        player.picture.delete();
         try {
             deleteLevel();
+            createLevel();
             spawnBoxes();
+            createPlayer();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        player.picture.delete();
+
         createLabel();
-        createPlayer();
+
 
     }
 
@@ -455,6 +495,8 @@ public class Game implements KeyboardHandler {
         }
         if(e.getKey() == KeyboardEvent.KEY_S && canMove(player, Direction.DOWN)){
 
+
+
             move(player, Direction.DOWN);
             updateMoves(Direction.DOWN);
             if(getBox() != null){
@@ -485,19 +527,60 @@ public class Game implements KeyboardHandler {
         }
 
         if(e.getKey() == KeyboardEvent.KEY_Z) {
+            try {
+                deleteLevel();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
             System.out.println("ctrl z");
-            undo();
         }
         if(e.getKey() == KeyboardEvent.KEY_SPACE){
             if(levelComplete){
-                level++;
-
                 resetLevel();
                 levelComplete = false;
                 picture.delete();
-                System.out.println("Space pressed");
             }
+            if(!running){
+                if(newGame){
+                    run();
+                    System.out.println("New Game");
+                } else {
+                    loadGame();
+                    run();
+                    System.out.println("Load Game");
+                }
+            }
+
             System.out.println("Space pressed");
+        }
+        if(e.getKey() == KeyboardEvent.KEY_H){
+            if(levelComplete){
+                saveGame();
+            }
+        }
+        if(e.getKey() == KeyboardEvent.KEY_L){
+            loadGame();
+            run();
+            System.out.println("Load Game");
+        }
+        if(e.getKey() == KeyboardEvent.KEY_K){
+            run();
+            System.out.println("New Game");
+        }
+        if(e.getKey() == KeyboardEvent.KEY_UP || e.getKey() == KeyboardEvent.KEY_DOWN){
+
+
+            String image1 = "resources/loadgame.png";
+            String image2 = "resources/startgame.png";
+
+            if(frame){
+                newGame = false;
+                picture.load(image1);
+            } else{
+                newGame = true;
+                picture.load(image2);
+            }
+            frame = !frame;
         }
     }
 

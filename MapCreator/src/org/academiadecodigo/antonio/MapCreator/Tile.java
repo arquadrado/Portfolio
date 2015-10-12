@@ -10,30 +10,46 @@ public class Tile {
     private boolean wall = false;
     private boolean box = false;
     private boolean storagePoint = false;
-    private Rectangle rectangle;
+    private boolean player = false;
+    private Rectangle body;
+    private static int size = 50;
+    private int col;
+    private int row;
 
-    public Tile(int originX, int originY, int col, int row){
-        this.rectangle = new Rectangle(originX, originY, col, row);
-        rectangle.setColor(Color.BLACK);
-        rectangle.draw();
+    public Tile(int col, int row){
+        this.col = col;
+        this.row = row;
+        this.body = new Rectangle(col * size, row * size, size, size);
+        body.setColor(Color.BLACK);
+        body.draw();
+    }
+
+    public static int getSize() {
+        return size;
+    }
+
+    public void createPlayer(){
+        body.setColor(Color.BLUE);
+        body.fill();
+        this.player = true;
     }
 
     public void createWall(){
-        rectangle.setColor(Color.BLACK);
-        rectangle.fill();
+        body.setColor(Color.BLACK);
+        body.fill();
         this.wall = true;
     }
 
     public void createBox(){
-        rectangle.setColor(Color.GRAY);
-        rectangle.fill();
+        body.setColor(Color.GRAY);
+        body.fill();
         this.box = true;
 
     }
 
     public void createStoragePoint(){
-        rectangle.setColor(Color.LIGHT_GRAY);
-        rectangle.fill();
+        body.setColor(Color.LIGHT_GRAY);
+        body.fill();
         this.storagePoint = true;
 
     }
@@ -42,8 +58,8 @@ public class Tile {
         this.wall = false;
         this.box = false;
         this.storagePoint = false;
-        rectangle.setColor(Color.BLACK);
-        rectangle.draw();
+        body.setColor(Color.BLACK);
+        body.draw();
     }
 
     public boolean isWall() {
@@ -53,8 +69,12 @@ public class Tile {
     public boolean isBox() {
         return box;
     }
+    public boolean isPlayer() {
+        return player;
+    }
 
     public boolean isStoragePoint() {
         return storagePoint;
     }
+
 }
