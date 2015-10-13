@@ -19,7 +19,7 @@ public class GameObject {
     protected int y;
     protected int lastCol;
     protected int lastRow;
-    protected Rectangle rectangle;
+    protected int movementUnit;
     public Picture picture;
 
 
@@ -27,7 +27,37 @@ public class GameObject {
     public GameObject(){
 
     }
+/*
+    public void move(Direction direction){
 
+        switch (direction){
+            case UP:
+                updatePosition(0, -1);
+
+                break;
+            case DOWN:
+                updatePosition(0, 1);
+
+                break;
+            case LEFT:
+                updatePosition(-1, 0);
+                break;
+            case RIGHT:
+                updatePosition(1, 0);
+                break;
+        }
+
+        System.out.println("Col: " + getLastCol() + " Row: " + getLastRow());
+    }
+
+    public  void updatePosition(int wayX, int wayY){
+        int col = getCol();
+        int row = getRow();
+        setLastPosition(col, row);
+        System.out.println("moving");
+        picture.translate(movementUnit * wayX, movementUnit * wayY);
+        setPosition(getCol() + wayX,getRow() + wayY);
+    }*/
 
 
     public Picture newPicture(int x, int y, String path){
@@ -39,23 +69,7 @@ public class GameObject {
 
         return picture;
     }
-    public Rectangle newObject(int x, int y,Color color){
 
-        Rectangle rectangle = new Rectangle(x, y, width, height);
-        rectangle.setColor(color);
-        rectangle.fill();
-
-        return rectangle;
-    }
-
-    public Rectangle newStroke(int x, int y,Color color){
-
-        Rectangle rectangle = new Rectangle(x, y, width, height);
-        rectangle.setColor(color);
-        rectangle.draw();
-
-        return rectangle;
-    }
     public void setPosition(int col, int row){
         this.col = col;
         this.row = row;
@@ -75,30 +89,20 @@ public class GameObject {
         return this.row;
     }
 
-    public void setCol(int x) {
-        this.col = x;
-    }
 
-    public void setRow(int y) {
-        this.row = y;
-    }
 
 
     public int getLastRow() {
         return lastRow;
     }
 
-    public void setLastRow(int lastRow) {
-        this.lastRow = lastRow;
-    }
+
 
     public int getLastCol() {
         return lastCol;
     }
 
-    public void setLastCol(int lastCol) {
-        this.lastCol = lastCol;
-    }
+
 
     public ID getId() {
         return id;

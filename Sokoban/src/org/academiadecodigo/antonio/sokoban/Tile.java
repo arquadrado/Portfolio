@@ -4,20 +4,16 @@ import org.academiadecodigo.simplegraphics.graphics.Color;
 import org.academiadecodigo.simplegraphics.graphics.Rectangle;
 
 /**
- * Created by António on 10-10-2015.
+ * Created by Antï¿½nio on 10-10-2015.
  */
 public class Tile {
     private boolean wall = false;
     private boolean box = false;
     private boolean storagePoint = false;
     private Rectangle rectangle;
-    private int col;
-    private int row;
 
-    public Tile(int originX, int originY, int col, int row){
-        this.col = col;
-        this.row = row;
-        this.rectangle = new Rectangle(originX, originY, col, row);
+    public Tile(int originX, int originY, int size){
+        this.rectangle = new Rectangle(originX, originY, size, size);
         rectangle.setColor(Color.WHITE);
         rectangle.draw();
     }
@@ -54,13 +50,7 @@ public class Tile {
         return wall;
     }
 
-    public int getCol() {
-        return col;
-    }
 
-    public int getRow() {
-        return row;
-    }
 
     public boolean isBox() {
         return box;
