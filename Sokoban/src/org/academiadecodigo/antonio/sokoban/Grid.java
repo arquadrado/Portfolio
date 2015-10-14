@@ -3,6 +3,8 @@ package org.academiadecodigo.antonio.sokoban;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -15,7 +17,7 @@ public class Grid {
     protected static int cellSize = 50;
     protected int cols;
     protected int rows;
-    protected FileReader fileReader;
+    protected InputStreamReader fileReader;
 
     public Grid(int cols, int rows){
         this.cols = cols;
@@ -43,11 +45,22 @@ public class Grid {
     public void createLevel() throws IOException {
         storagePoints = new ArrayList<>();
         walls = new ArrayList<>();
-        try {
-            fileReader = new FileReader("maps/map-level-" + Game.level + ".txt");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+         try {
+                // Attempt to load from the class path (as in JAR file..)
+                URL url = getClass().getResource(Game.mapSource().startsWith("/") ? Game.mapSource() : "/" + Game.mapSource());
+
+                if (url != null) {
+                    fileReader = new InputStreamReader(url.openStream());
+                } else {
+
+                    // Load from file
+                    fileReader = new FileReader(Game.mapSource());
+                }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
+
         for(int i = 0; i < rows; i++){
 
             for(int j = 0; j < cols; j++){

@@ -30,9 +30,18 @@ public class Game implements KeyboardHandler {
     private int totalMoves = 0;
     private int pushes = 0;
     private int totalPushes = 0;
-    private FileReader fileReader;
+    private InputStreamReader fileReader;
     boolean frame = true;
     boolean newGame = true;
+    static String source;
+    static String saveSource = "savegame.txt";
+
+
+
+    public static String mapSource(){
+        source = "resources/maps/map-level-" + level + ".txt";
+        return source;
+    }
 
     // starts the game
     public void start(){
@@ -42,8 +51,6 @@ public class Game implements KeyboardHandler {
         picture.draw();
 
     }
-
-
 
     public void run() {
         running = true;
@@ -78,10 +85,30 @@ public class Game implements KeyboardHandler {
         in.read();*/
 
         try {
+                // Attempt to load from the class path (as in JAR file..)
+                URL url = getClass().getResource(mapSource().startsWith("/") ? mapSource() : "/" + mapSource());
+
+                if (url != null) {
+                    fileReader = new InputStreamReader(url.openStream());
+                } else {
+
+                    // Load from file
+                    fileReader = new FileReader(mapSource());
+                }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+
+
+        /*
+        try {
             fileReader = new FileReader("maps/map-level-" + level + ".txt");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        */
         for(int i = 0; i < row; i++){
 
             for(int j = 0; j < col; j++){
@@ -105,11 +132,23 @@ public class Game implements KeyboardHandler {
 
 
     public void createPlayer(Game game) throws IOException {
+
         try {
-            fileReader = new FileReader("maps/map-level-" + level + ".txt");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
+                // Attempt to load from the class path (as in JAR file..)
+                URL url = getClass().getResource(mapSource().startsWith("/") ? mapSource() : "/" + mapSource());
+
+                if (url != null) {
+                    fileReader = new InputStreamReader(url.openStream());
+                } else {
+
+                    // Load from file
+                    fileReader = new FileReader(source);
+                }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
+
         for(int i = 0; i < row; i++){
 
             for(int j = 0; j < col; j++){
@@ -129,8 +168,31 @@ public class Game implements KeyboardHandler {
     }
 
     public void loadGame(){
+
         try {
-            fileReader = new FileReader("saves/savegame.txt");
+            // Attempt to load from the class path (as in JAR file..)
+            URL url = getClass().getResource(saveSource.startsWith("/") ? saveSource : "/" + saveSource);
+
+            if (url != null) {
+                fileReader = new InputStreamReader(url.openStream());
+                BufferedReader buffer = new BufferedReader(fileReader);
+                String line = buffer.readLine();
+                this.level = Integer.parseInt(line);
+
+            } else {
+                fileReader = new FileReader(saveSource);
+                BufferedReader buffer = new BufferedReader(fileReader);
+                String line = buffer.readLine();
+                this.level = Integer.parseInt(line);
+            }
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+
+       /* try {
+            fileReader = new FileReader("resources/saves/savegame.txt");
             BufferedReader buffer = new BufferedReader(fileReader);
             String line = buffer.readLine();
 
@@ -144,14 +206,14 @@ public class Game implements KeyboardHandler {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     public void saveGame(){
 
             try {
                 //fileWriter = new PrintWriter("saves/savegame.txt", "UTF-8");
-                FileWriter fileWriter = new FileWriter("saves/savegame.txt");
+                FileWriter fileWriter = new FileWriter("savegame.txt");
                 fileWriter.write(new Integer(level).toString());
                 fileWriter.close();
                 System.out.println("Saving...");
@@ -361,7 +423,7 @@ public class Game implements KeyboardHandler {
                 }
             }
         }
-        if(e.getKey() == KeyboardEvent.KEY_W){
+        if(e.getKey() == KeyboardEvent.KEY_K){
             if(levelComplete){
                 saveGame();
             }
