@@ -10,9 +10,10 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
  */
 public class MyAnimations {
 
-    private static int FRAME_COLS;
-    private static int FRAME_ROWS;
+    private int FRAME_COLS;
+    private int FRAME_ROWS;
     private int xPosition;
+    private int yPosition;
 
     Animation standing;
     Texture spriteSheet;
@@ -20,12 +21,15 @@ public class MyAnimations {
     TextureRegion currentFrame;
     String path;
     float stateTime;
+    boolean backwards;
 
-    public MyAnimations(String path, int cols, int rows, int xPosition){
+    public MyAnimations(String path, int cols, int rows, int xPosition, int yPosition, boolean backwards){
         FRAME_COLS = cols;
         FRAME_ROWS = rows;
         this.xPosition = xPosition;
+        this.yPosition = yPosition;
         this.path = path;
+        this.backwards = backwards;
 
     }
 
@@ -35,16 +39,23 @@ public class MyAnimations {
 
         TextureRegion[][] tmp = TextureRegion.split(spriteSheet, spriteSheet.getWidth()/FRAME_COLS, spriteSheet.getHeight()/FRAME_ROWS);
 
-
         frames = new TextureRegion[FRAME_COLS * FRAME_ROWS];
+
+
         int index = 0;
         for (int i = 0; i < FRAME_ROWS; i++) {
-            for (int j = 0; j < FRAME_COLS; j++) {
-                frames[index++] = tmp[i][j];
+            if(backwards){
+                for (int j = FRAME_COLS - 1; j >= 0; j--) {
+                    frames[index++] = tmp[i][j];
+                }
+                }else {
+                for (int j = 0; j < FRAME_COLS; j++) {
+                    frames[index++] = tmp[i][j];
+                }
             }
         }
 
-        standing = new Animation(2.00f/ (FRAME_COLS * FRAME_ROWS), frames);
+        standing = new Animation(1.00f/ (FRAME_COLS * FRAME_ROWS), frames);
         stateTime = 0f;
     }
 
@@ -74,6 +85,14 @@ public class MyAnimations {
 
     public int getxPosition() {
         return xPosition;
+    }
+
+    public int getyPosition() {
+        return yPosition;
+    }
+
+    public void setyPosition(int yPosition) {
+        this.yPosition = yPosition;
     }
 
     public void setxPosition(int xPosition) {

@@ -232,17 +232,15 @@ public class Game implements KeyboardHandler {
         keyboard = new Keyboard(this);
 
         ArrayList<KeyboardEvent> event = new ArrayList();
-        for(int i = 0; i < 9; i++){
+        for(int i = 0; i < 7; i++){
             event.add(new KeyboardEvent());
-            if(i == 0)event.get(i).setKey(KeyboardEvent.KEY_W);
-            if(i == 1)event.get(i).setKey(KeyboardEvent.KEY_S);
-            if(i == 2)event.get(i).setKey(KeyboardEvent.KEY_A);
-            if(i == 3)event.get(i).setKey(KeyboardEvent.KEY_D);
-            if(i == 4)event.get(i).setKey(KeyboardEvent.KEY_R);
-            if(i == 5)event.get(i).setKey(KeyboardEvent.KEY_SPACE);
-            if(i == 6)event.get(i).setKey(KeyboardEvent.KEY_K);
-            if(i == 7)event.get(i).setKey(KeyboardEvent.KEY_UP);
-            if(i == 8)event.get(i).setKey(KeyboardEvent.KEY_DOWN);
+            if(i == 0)event.get(i).setKey(KeyboardEvent.KEY_LEFT);
+            if(i == 1)event.get(i).setKey(KeyboardEvent.KEY_RIGHT);
+            if(i == 2)event.get(i).setKey(KeyboardEvent.KEY_R);
+            if(i == 3)event.get(i).setKey(KeyboardEvent.KEY_SPACE);
+            if(i == 4)event.get(i).setKey(KeyboardEvent.KEY_K);
+            if(i == 5)event.get(i).setKey(KeyboardEvent.KEY_UP);
+            if(i == 6)event.get(i).setKey(KeyboardEvent.KEY_DOWN);
             event.get(i).setKeyboardEventType(KeyboardEventType.KEY_PRESSED);
             keyboard.addEventListener(event.get(i));
         }
@@ -356,7 +354,7 @@ public class Game implements KeyboardHandler {
     @Override
     public void keyPressed(KeyboardEvent e) {
 
-        if(e.getKey() == KeyboardEvent.KEY_W && running){
+        if(e.getKey() == KeyboardEvent.KEY_UP && running){
 
             if(player.canMove(Direction.UP) ){
                 player.move(Direction.UP);
@@ -368,7 +366,7 @@ public class Game implements KeyboardHandler {
             }
 
         }
-        if(e.getKey() == KeyboardEvent.KEY_S && running){
+        if(e.getKey() == KeyboardEvent.KEY_DOWN && running){
 
             if(player.canMove(Direction.DOWN) ){
                 player.move(Direction.DOWN);
@@ -380,7 +378,7 @@ public class Game implements KeyboardHandler {
             }
 
         }
-        if(e.getKey() == KeyboardEvent.KEY_A && running){
+        if(e.getKey() == KeyboardEvent.KEY_LEFT && running){
 
             if(player.canMove(Direction.LEFT) ){
                 player.move(Direction.LEFT);
@@ -391,7 +389,7 @@ public class Game implements KeyboardHandler {
                 }
             }
         }
-        if(e.getKey() == KeyboardEvent.KEY_D && running) {
+        if(e.getKey() == KeyboardEvent.KEY_RIGHT && running) {
 
             if(player.canMove(Direction.RIGHT) ){
                 player.move(Direction.RIGHT);
@@ -428,7 +426,7 @@ public class Game implements KeyboardHandler {
                 saveGame();
             }
         }
-        if(e.getKey() == KeyboardEvent.KEY_UP || e.getKey() == KeyboardEvent.KEY_DOWN){
+        if((e.getKey() == KeyboardEvent.KEY_UP || e.getKey() == KeyboardEvent.KEY_DOWN) && !running){
 
             String image1 = "resources/loadgame.png";
             String image2 = "resources/startgame.png";
